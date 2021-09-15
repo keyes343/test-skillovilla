@@ -11,6 +11,8 @@
         'pic title'
         'pic body'
         '. collapsible-controller'
+        '. collapsible-main'
+        '. children-comments'
     ;
 }
 .pic-box{
@@ -27,13 +29,13 @@
 .body-area{
 }
 .collapsible-controller{    
-    /* border: 2px solid blue; */
     display:grid;
     grid-template-columns: repeat(5,auto) 1fr;
     gap:1rem;
 }
 .controller-item{
     width:auto;
+    color:grey;
 }
 
 
@@ -54,4 +56,18 @@
     display:grid;
     place-items: center center;
     cursor:pointer;
+}
+
+.collapsible-input-area{
+    /* border: 2px solid blue; */
+}
+.inputWrapper{
+    
+}
+
+.children-comments-section{
+
+}
+.child-comment{
+
 }

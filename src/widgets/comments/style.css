@@ -54,18 +54,23 @@
 .header{
     width: 100%;
     max-width:900px;
+    display:grid;
+    gap:1rem;
     /* margin:auto; */
 }
 
 .input_section{
     grid-template-columns: auto 1fr;
-    gap: var(--column-gap);
+    gap: 1rem;
+    place-items: center start;
 }
 .input_box {
     height:98%;
     width:100%;
     border-radius:8px;
     border: 2px solid var(--grey);
+    display:grid;
+    min-height:2rem;
 }
 /* .input_iteself{
     height:100%;
@@ -78,8 +83,11 @@
 input{
     outline: none;
     border:none;
-    padding:1rem;
-    font-size:1.2rem;
+    padding:0 0.5rem;
+    font-size:1.1rem;
+    /* margin: 0 0 0 0; */
+    width: 97%;
+    height: 100%;
     /* border: 2px solid grey; */
 } 
 

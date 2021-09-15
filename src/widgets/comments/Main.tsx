@@ -10,7 +10,7 @@ type Comment = {
     owner:string;
     createdAt:number;
     text:string,
-    children: Comment[]
+    children: string[], // these are ids of other comments
 }
 
 type CommentsDictionary = {
@@ -25,26 +25,44 @@ const Main = () => {
     // dictionary
     const [commentsDictionary, set_commentsDictionary] = useState<CommentsDictionary>({});
 
+    const editComment = (_id: string,action:'delete'|'reply'|'share', newComment?:Comment) => {
+        // get comment
+        const gotComment = {...commentsDictionary[_id]};
+        console.log({gotComment,_id});
+        switch(action){
+            case 'reply': 
+                if(newComment){
+                    gotComment.children.push(newComment._id); // set heirarchey
+                    set_commentsDictionary({ 
+                        ...commentsDictionary,
+                        [newComment._id]:newComment // add to dictionary
+                    })
+                }
+        }
+    }
+
     const x = {
         typedComment,
         set_typedComment,
         commentsDictionary,
         set_commentsDictionary,
         list,
-        set_list
+        set_list,
+        editComment
     }
 
     return(
         <div className='top' >
             {/* console purpose */}
             <div
-             
              style={{height:'5rem', border:'2px solid red', width:'100%'}}
              onClick={()=>{
-                console.log({
-                    list,commentsDictionary,typedComment
-                })
-            }} />
+                 console.log({
+                     list,commentsDictionary,typedComment
+                    })
+                }} 
+            />
+                
             <div className='header' style={{border:'2px solid green'}}>
                 <CommentsInput  x={x} />
                 <ViewComments x={x} />
@@ -65,6 +83,7 @@ interface RootExtension {
         set_commentsDictionary: setAnything<CommentsDictionary>,
         list: Comment[],
         set_list: setAnything<Comment[]>,
+        editComment: (_id: string, action: 'delete' | 'reply' | 'share', newComment?: Comment | undefined) => void
     }
 }
 
@@ -75,10 +94,13 @@ const CommentsInput = ({x}:RootExtension) => {
             <div className='grid pic' >
                 <BsFillPersonFill style={{fontSize:'inherit', color:'inherit', opacity:0.5}} />
             </div>
+
             <div className='grid input_box' >
                 <input className='input_itself' value={x.typedComment} 
                 onChange={(e) => x.set_typedComment(e.currentTarget.value)} 
                 onBlur={()=>{
+                    if(x.typedComment.length === 0) return;
+
                     const _id = uuidv4();
                     const newComment: Comment = {
                         _id,
@@ -93,7 +115,7 @@ const CommentsInput = ({x}:RootExtension) => {
                     // add to dictionary
                     x.set_commentsDictionary({
                         ...x.commentsDictionary,
-                        _id: newComment
+                        [_id]: newComment
                     })
                     x.set_typedComment('')
                 }}
@@ -110,7 +132,7 @@ const ViewComments = ({x}:RootExtension) => {
             {
                 x.list.map((comment,i)=>{
                     return(
-                        <CommentLine comment={comment} />
+                        <CommentLine key={i} comment={comment} x={x} />
                     )
                 })
             }
@@ -120,8 +142,21 @@ const ViewComments = ({x}:RootExtension) => {
 
 
 // comment_line
+interface CommentLineProps extends RootExtension{
+    comment:Comment
+}
+const CommentLine = ({comment, x}:CommentLineProps) => {
 
-const CommentLine = ({comment}:{comment: Comment}) => {
+    const [collapse, set_collapse] = useState(false);
+
+    const x2 = {
+        collapse,set_collapse,
+    }
+
+    // when user tries to reply to someone, capture the input here
+    const [replied, set_replied] = useState('');
+
+
     return(
         <div className='listItem'>
             {/* pic */}
@@ -139,10 +174,76 @@ const CommentLine = ({comment}:{comment: Comment}) => {
 
             {/* collapsible-reply-share options */}
             <div style={{gridArea:'collapsible-controller'}} className='body-area' >
-                <CollapsibleController comment={comment} />
+                <CollapsibleController comment={comment} x2={x2} />
             </div>
+
+            {/* collapsible-input-area */}
+            <div className='collapsible-input-area' style={{gridArea:'collapsible-main', display: collapse?'none':'grid' }}>
+                <div className='input_box grid' >
+                    <input placeholder='replying...' onChange={(e)=>{
+                            set_replied(e.currentTarget.value)
+                        }}
+                        value={replied}
+
+                        onBlur={()=>{
+                            if(replied.length === 0) return;
+                            const _id = uuidv4();
+                            const newComment: Comment = {
+                                _id,
+                                owner: 'random owner',
+                                createdAt: Date.now(),
+                                text: replied,
+                                children: []
+                            }
+                            // add to self list, not main list
+                            x.editComment(comment._id, 'reply', newComment);
+
+                            // add to dictionary
+                            x.set_commentsDictionary({
+                                ...x.commentsDictionary,
+                                [_id]: newComment
+                            })
+                            set_replied('');
+                        }}
+                    />
+                </div>
+            </div>
+
+            {/* children-comments */}
+            <ChildrenCommentSection _ids={comment.children} x={x} />
         </div>
 )}
+
+// children-comments
+interface ChildrenCommentSectionProps extends RootExtension {
+    _ids:string[]
+}
+
+const ChildrenCommentSection = (p:ChildrenCommentSectionProps) => {
+
+    const comments = () =>{
+        return p._ids.map((_id,i)=>{
+            return(
+                p.x.commentsDictionary[_id]
+            )
+        })
+    }
+
+    return(
+        <div className='children-comments' style={{gridArea:'children-comments'}} >
+            {
+                comments().map((comment,i)=>{
+                    return(
+                        <div key={i}>
+                            <CommentLine comment={comment} x={p.x} />
+                            {/* {comment.text} */}
+                        </div>
+                    )
+                })
+            }
+        </div>
+    )
+}
 
 const TitleRow = ({comment}:{comment:Comment}) => {
     return(
@@ -161,25 +262,35 @@ const TitleRow = ({comment}:{comment:Comment}) => {
         </div>
 )}
 
-const CollapsibleController = ({comment}:{comment: Comment}) => {
+interface CollapsibleControllerProps {
+    x2:{
+        collapse:boolean,
+        set_collapse: setAnything<boolean>,
+    },
+    comment:Comment
+}
+
+const CollapsibleController = ({comment,x2}:CollapsibleControllerProps) => {
     return(
         <div className='collapsible-controller' >
-            <div className='iconWrapper'>
+            <div  className='iconWrapper controller-item'>
                 <FaAngleDown style={{fontSize:'inherit',color:'inherit'}} />
             </div>
 
-            <div style={{border:'1px solid grey'}} />
-            
-            <div className='iconWrapper'>
+            <div  style={{border:'1px solid grey'}} />
+
+            <div  className='iconWrapper controller-item'>
                 <FaAngleUp style={{fontSize:'inherit',color:'inherit'}} />
             </div>
 
 
-            <div>
-                reply
+            <div className='controller-item' onClick={() => {
+                x2.set_collapse(false)
+            }}>
+                Reply
             </div>
-            <div>
-                share
+            <div className='controller-item'>
+                Share
             </div>
 
             {/* large gapping purpose */}
