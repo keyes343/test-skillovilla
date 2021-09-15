@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css?family=Inconsolata|Poppins|Cardo|Inter&display=swap');
+
+
+:root{
+    --column-gap: 0.5rem;
+    --row-gap:1.3rem;
+    --blue: #1DA8FF;
+    --grey:rgba(0, 0, 0, 0.15);
+    --default: 'Inter', sans-serif;
+
+    font-family: var(--default);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.plain_text {
+    font-size: 1rem;
+}
+.small_text {
+    font-size: 0.9rem;
+}
+.medium_text {
+    font-size: 1.3rem;
+}
+.large_text {
+    font-size: 1.6rem;
+}
+.larger_text {
+    font-size: 2rem;
+}
+
+
+/* grid */
+.grid{
+    display:grid;
+    place-items: center center;
+}
+.pic{
+    height:3.5rem;
+    width:3.5rem;
+    background-color:var(--grey);
+    border-radius: 3px;
+    font-size:3rem;
+    opacity:0.5;
+}
+.top{
+    display:grid;
+    place-items: center;
+    grid-template-columns: 1fr;
+    width:auto;
+    margin:auto;
+}
+
+.header{
+    width: 100%;
+    max-width:900px;
+    /* margin:auto; */
+}
+
+.input_section{
+    grid-template-columns: auto 1fr;
+    gap: var(--column-gap);
+}
+.input_box {
+    height:98%;
+    width:100%;
+    border-radius:8px;
+    border: 2px solid var(--grey);
+}
+/* .input_iteself{
+    height:100%;
+    width:100%;
+    padding:0.7rem;    
+} */
+/* ::placeholder {
+    font-size:1.8rem;
+} */
+input{
+    outline: none;
+    border:none;
+    padding:1rem;
+    font-size:1.2rem;
+    /* border: 2px solid grey; */
+} 
+
+
+/* colorful borders */
+.red{
+    border:2px solid red;
+}
+.blue{
+    border:2px solid blue;
+}
+.green{
+    border:2px solid green;
+}
+.orange{
+    border:2px solid orange;
+}
+.cyan{
+    border:2px solid cyan;
+}

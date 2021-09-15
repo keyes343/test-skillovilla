@@ -1,0 +1,57 @@
+.comment_section{
+    display:grid;
+    gap:1rem;
+}
+
+.listItem {
+    display:grid;
+    gap:1rem;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+        'pic title'
+        'pic body'
+        '. collapsible-controller'
+    ;
+}
+.pic-box{
+    height:3.5rem;
+    width:3.5rem;
+    background-color:var(--grey);
+    border-radius: 3px;
+    font-size:3rem;
+    opacity:0.5;
+}
+/* .title-area{
+    height:auto;
+} */
+.body-area{
+}
+.collapsible-controller{    
+    /* border: 2px solid blue; */
+    display:grid;
+    grid-template-columns: repeat(5,auto) 1fr;
+    gap:1rem;
+}
+.controller-item{
+    width:auto;
+}
+
+
+/* component = TitleRow */
+.title-row {
+    display:grid;   
+    grid-template-columns: repeat(3,auto) 1fr;
+    gap:1rem;
+    place-items: start center;
+}
+.title-item{
+    width:auto;
+}
+
+.iconWrapper{
+    /* border: 2px solid blue; */
+    min-width:2rem;
+    display:grid;
+    place-items: center center;
+    cursor:pointer;
+}
