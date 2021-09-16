@@ -14,8 +14,7 @@ function App() {
 
           Pending tasks are - <br/><br/>
           1. Like Button <br/>
-          2. Delete Button <br/>
-          3. Somethings pending in 'searchbar' <br/> <br/>
+          2. Delete Button <br/> 
 
           Did not get time to finish these.
         </p>
