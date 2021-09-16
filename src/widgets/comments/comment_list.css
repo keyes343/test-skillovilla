@@ -85,32 +85,39 @@
 /* SEARCH SECTION */
 
 .searchBox_wrapper{
-    border: 2px solid blue;
     width: 100%;
-    max-width:800px;
+    max-width:900px;
     display:grid;
     gap:1rem;
     z-index:10;
     position:relative;
 }
 .searchBox_inputWrapper{
-    border: 2px solid red;
-    width: 100%;
+    border: 2px solid rgba(0,0,0,0.2);
+    padding:0.3rem;
+    width: 95%;
+    max-width:500px;
 }
 
 .searchBox_collapsible {
     position:absolute;
-    top:2rem;
+    top:3rem;
     z-index:20;
     background-color:white;
     width:100%;
+}
+.searchBox_midWrapper{
     gap:1rem;
     display:grid;
+    padding:0.7rem;
 }
 
 .card {
-    /* border: 2px solid blue; */
     padding:0.3rem;
+}
+.card:hover{
+    /* background-color:rgba(0,0,0,0.2); */
+    border:1px solid grey;
 }
 
 .popup {
@@ -138,4 +145,20 @@
     display:grid;
     gap:1rem;
     place-items: center start;
+}
+
+.sorting_options {
+    display:grid; 
+    grid-template-columns: repeat(2, auto) 1fr;
+    gap:1rem;
+}
+.sorting_item {
+    padding:0.4rem 0.7rem;
+    background-color:rgb(50, 53, 68);
+    color:rgb(240, 238, 238);
+    font-size:1.2rem;
+    /* font-weight:bold; */
+    border-radius:8px;
+    cursor:pointer;
+    position:relative;
 }

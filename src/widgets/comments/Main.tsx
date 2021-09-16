@@ -7,6 +7,7 @@ import {BsDot} from 'react-icons/bs';
 import {AiFillEdit} from 'react-icons/ai';
 import {VscChromeClose} from 'react-icons/vsc';
 import {RiDeleteBinLine} from 'react-icons/ri';
+import {FcLike,FcLikePlaceholder} from 'react-icons/fc';
 import { v4 as uuidv4 } from 'uuid';
 
 type Comment = {
@@ -14,6 +15,7 @@ type Comment = {
     owner:string;
     createdAt:number;
     text:string,
+    // liked:boolean,
     children: string[], // these are ids of other comments
 }
 
@@ -27,7 +29,8 @@ const Main = () => {
 
     const [list, set_list] = useState<Comment[]>([]);
 
-    const [prevUserNames, set_prevUserNames] = useState(['']);
+    const [deleted, set_deleted] = useState(['']); // deleted ids
+    const [liked, set_liked] = useState(['']); // liked ids
     const [userName, set_userName] = useState('');
     // dictionary
     const [commentsDictionary, set_commentsDictionary] = useState<CommentsDictionary>({});
@@ -131,8 +134,12 @@ const Main = () => {
         list,
         set_list, 
         
-        prevUserNames, set_prevUserNames,
-        userName,set_userName,
+        deleted,
+        set_deleted,
+        // liked,set_liked,
+
+        userName,
+        set_userName,
 
         store_into_local,
         retrieve_from_local,
@@ -143,19 +150,21 @@ const Main = () => {
     return(
         <div className='top' >
             {/* console purpose */}
-            <div
+            {/* <div
              style={{height:'5rem', border:'2px solid red', width:'100%'}}
              onClick={()=>{
                  console.log({
                      list,commentsDictionary,typedComment
                     })
                 }} 
-            />
+            /> */}
 
             <UserName x={x} />
             <SearchSection x={x} />
-                
-            <div className='header' style={{border:'2px solid green'}}>
+
+            <div style={{margin:'1rem 0' }} />    
+            
+            <div className='header' >
                 <CommentsInput  x={x} />
                 <ViewComments x={x} />
             </div>
@@ -174,15 +183,18 @@ interface RootExtension {
         commentsDictionary: CommentsDictionary,
         set_commentsDictionary: setAnything<CommentsDictionary>,
         list: Comment[],
+        set_list: setAnything<Comment[]>,
+        
+        deleted:string[],
+        set_deleted: setAnything<string[]>,
+        
+        userName:string,
+        set_userName: setAnything<string>,
+        // liked:string[],
+        // set_liked: setAnything<string[]>,
         store_into_local : () => void,
         retrieve_from_local : () => void,
 
-        prevUserNames: string[], 
-        set_prevUserNames : setAnything<string[]> ,
-        userName:string,
-        set_userName: setAnything<string>,
-
-        set_list: setAnything<Comment[]>,
         
 
         editComment: (_id: string, action: 'delete' | 'reply' | 'share'|'edit', payload:{ newComment?:Comment, editable?:string}) => void
@@ -202,6 +214,8 @@ const CommentsInput = ({x}:RootExtension) => {
                 onChange={(e) => x.set_typedComment(e.currentTarget.value)} 
                 maxLength={200}
                 onBlur={()=>{
+                    if(x.userName.length===0) return;
+
                     if(Object.values(x.commentsDictionary).some(z => z.owner === x.userName )){
                         alert('Username already made an entry. User new username');
                         x.set_userName('');
@@ -389,6 +403,9 @@ const TitleRow = (p:CommentLineProps) => {
 
     const [showPopup, set_showPopup] = useState(false);
 
+    // const toggle_liked = () =>{
+    //     p.x
+    // }
 
     return(
         <div className='title-row'>
@@ -408,10 +425,32 @@ const TitleRow = (p:CommentLineProps) => {
             }}  />
 
             <RiDeleteBinLine style={{fontSize:'1.5rem', cursor: 'pointer'}}
-                onClick={() => {
-                    p.x.editComment(p.comment._id,'delete',{})
-                }}
+                // onClick={() => {
+                //     p.x.editComment(p.comment._id,'delete',{})
+                //     // also detele its existence from any parent comment
+                //     const find_parent = Object.values(p.x.commentsDictionary).find(c => c.children.includes(p.comment._id));
+                //     if(find_parent){
+                //         const parent_id = find_parent._id;
+                //         let arr = find_parent.children;
+                //         const indx = arr.indexOf(parent_id);
+                //         arr.splice(indx,1);
+                //         find_parent.children = arr;
+                //         p.x.set_commentsDictionary({
+                //             ...p.x.commentsDictionary,
+                //             [find_parent._id] : find_parent
+                //         })
+                //     }
+                // }}
             />
+
+            {/* <div className='liked_icon' >
+                {
+                    p.comment.liked? 
+                    <FcLike style={{fontSize:'inherit'}} />: 
+                    <FcLikePlaceholder style={{fontSize:'inherit'}} />
+                }
+            </div> */}
+            
 
             {/* large gapping purpose */}
             <div/>
@@ -523,34 +562,78 @@ const CollapsibleController = ({comment,x,x2}:CollapsibleControllerProps) => {
 
 const SearchSection = (p:RootExtension) => {
 
+
+    const [searchWords, set_searchWords] = useState('');
+    const [ascending, set_ascending] = useState(false);
     const [collapse, set_collapse] = useState(true);
 
+    const highlight = (text:string) => {
+        const texts = text.split(' ');
+        const search_words = searchWords.split(' ');
+        return texts.map((txt,i) => {
+            return <span key={i} style={{backgroundColor: search_words.some((word,i) => texts.some((txt,j) => txt.toLocaleLowerCase() === word.toLowerCase()) ) ? 'yellow':''}} >
+                {txt}
+            </span>
+        })
+    }
+
     return(
-        <div className='searchBox_wrapper'>
-            <div className='searchBox_inputWrapper'>
-                <input style={{width:'98%'}} placeholder='search...' 
+        <div className='searchBox_wrapper'  onClick={(e) => set_collapse(true)} >
+            <div className='searchBox_inputWrapper' onClick={(e) => e.stopPropagation()} >
+                <input style={{width:'98%' }} placeholder='search...' 
                 maxLength={200}
+                onChange={(e) => set_searchWords(e.currentTarget.value) }
                 onFocus={()=> set_collapse(false)} 
-                    onBlur={() => set_collapse(true)}
+                    
                 />
             </div>
 
             <div className={'searchBox_collapsible'} 
                 style={{
                     boxShadow: collapse ? '':'0 0 20px 2px rgba(0,0,0,0.5)',
-                    maxHeight: collapse? '0':'10rem',
+                    maxHeight: collapse? '0':'50rem',
                     overflow:'auto'
                 }}
             >
-                {
-                    Object.values(p.x.commentsDictionary).map((comment,i)=>{
-                        return(
-                            <div key={i} className={'card'} >
-                                {comment.text}
-                            </div>
-                        )
-                    })
-                }
+                <div className={'searchBox_midWrapper'} onClick={(e) => e.stopPropagation()}>
+
+
+                    <div className='sorting_options' >
+                        <div className={'sorting_item'} onClick={() => set_ascending(true) } >
+                            Date Ascending
+                        </div>
+                        <div className={'sorting_item'} onClick={() => set_ascending(false) } >
+                            Date Descending
+                        </div>
+
+                        <VscChromeClose onClick={() => set_collapse(true)} 
+                        style={{position:'absolute', color:'black', fontSize:'2rem', right:'1rem', top:'1rem', cursor:'pointer'}} />
+
+                        {/* gapping purpose */}
+                        <div/>
+                    </div>
+
+                    {
+                        Object.values(p.x.commentsDictionary).sort((a,b) => ascending? a.createdAt -b.createdAt : b.createdAt - a.createdAt).map((comment,i)=>{
+                            return(
+                                <div key={i} className={'card'} >
+                                    <div style={{fontWeight:'bold'}}>
+                                        {/* Comments details are below.  */}
+                                        userid = {comment.owner}
+                                    </div> 
+                                    <div>
+                                        comment text = { highlight(comment.text)}
+                                    </div>
+                                    <div>
+                                        date = {new Date(comment.createdAt).getDate()}, <br/>
+                                        hour = {new Date(comment.createdAt).getHours()}, <br/>
+                                        minutes = {new Date(comment.createdAt).getMinutes()}, 
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+                </div>
             </div>
         </div>
     )
@@ -565,7 +648,7 @@ const UserName = (p:RootExtension) => {
             <div style={{fontSize:'1.3rem'}} >
                 USERNAME = {p.x.userName}
             </div>
-            <input style={{border:'2px solid grey'}} 
+            <input style={{border:'2px solid rgba(0,0,0,0.2)', padding:'0.2rem', maxWidth:'500px'}} 
             maxLength={200}
             placeholder='Enter your name here'
             value={p.x.userName} onChange={(e) => p.x.set_userName(e.currentTarget.value)} />
