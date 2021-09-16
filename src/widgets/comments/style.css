@@ -49,6 +49,7 @@
     grid-template-columns: 1fr;
     width:auto;
     margin:auto;
+    gap:1rem;
 }
 
 .header{
@@ -86,7 +87,7 @@ input{
     padding:0 0.5rem;
     font-size:1.1rem;
     /* margin: 0 0 0 0; */
-    width: 97%;
+    width: 94%;
     height: 100%;
     /* border: 2px solid grey; */
 } 

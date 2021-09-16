@@ -30,24 +30,28 @@
 }
 .collapsible-controller{    
     display:grid;
-    grid-template-columns: repeat(5,auto) 1fr;
-    gap:1rem;
+    grid-template-columns: repeat(8,auto) 1fr;
+    gap:0.4rem;
+    /* border: 2px solid blue; */
 }
 .controller-item{
     width:auto;
-    color:grey;
+    color:rgba(0,0,0,0.25);
+    font-weight:bold;
 }
 
 
 /* component = TitleRow */
 .title-row {
     display:grid;   
-    grid-template-columns: repeat(3,auto) 1fr;
+    grid-template-columns: repeat(5,auto) 1fr;
     gap:1rem;
     place-items: start center;
 }
 .title-item{
     width:auto;
+    color:var(--blue);
+    font-weight: bold;
 }
 
 .iconWrapper{
@@ -70,4 +74,68 @@
 }
 .child-comment{
 
+}
+
+.collapse-action{
+    transition: all 0.4s ease-in-out;
+    overflow-y:auto;
+    overflow-x:hidden;
+}
+
+/* SEARCH SECTION */
+
+.searchBox_wrapper{
+    border: 2px solid blue;
+    width: 100%;
+    max-width:800px;
+    display:grid;
+    gap:1rem;
+    z-index:10;
+    position:relative;
+}
+.searchBox_inputWrapper{
+    border: 2px solid red;
+    width: 100%;
+}
+
+.searchBox_collapsible {
+    position:absolute;
+    top:2rem;
+    z-index:20;
+    background-color:white;
+    width:100%;
+    gap:1rem;
+    display:grid;
+}
+
+.card {
+    /* border: 2px solid blue; */
+    padding:0.3rem;
+}
+
+.popup {
+    position:fixed;
+    /* height:10vh; */
+    width:50vw;
+    top:50%;
+    left:50%;
+    padding:1rem;
+    transform:translate(-50%,-50%);
+    z-index: 100;
+    background-color: rgb(11, 25, 39);
+    border-radius:20px;
+    display:grid;
+    grid-template-columns: 1fr auto; 
+}
+
+.closeBtn{
+}
+
+.userName_wrapper{
+    /* border: 2px solid blue; */
+    width:100%;
+    max-width:900px;
+    display:grid;
+    gap:1rem;
+    place-items: center start;
 }
